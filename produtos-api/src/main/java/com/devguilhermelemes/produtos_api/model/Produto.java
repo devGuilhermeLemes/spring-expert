@@ -1,5 +1,9 @@
 package com.devguilhermelemes.produtos_api.model;
 
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -18,7 +22,8 @@ import lombok.NoArgsConstructor;
 public class Produto {
 
     @Id
-    private String id;
+    @UuidGenerator
+    private UUID id;
     
     private String nome;
     private String descricao;
