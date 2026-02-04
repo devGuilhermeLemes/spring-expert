@@ -3,12 +3,16 @@ package com.devguilhermelemes.produtos_api.controller;
 // import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.devguilhermelemes.produtos_api.model.Produto;
 import com.devguilhermelemes.produtos_api.repository.ProdutoRepository;
@@ -27,23 +31,21 @@ public class ProdutoController {
     @PostMapping
     public Produto salvar(@RequestBody Produto produto) {
         System.out.println("Produto Recebido: " + produto);
-
-        // ! Controller não deve ter regra de geração de identidade | Se amanhã você
-        // salvar produto em outro fluxo → quebra | Viola SRP (Single Responsibility
-        // Principle)
-        // var id = UUID.randomUUID().toString(); MÁ PRATICA
-        // produto.setId(id); MÁ PRATICA
-        // * Deixar o Hibernate gerar UUID automaticamente
         produtoRepository.save(produto);
-
         return produto;
     }
 
     @GetMapping("/{id}")
-    public Produto obterPorId(@PathVariable("id") UUID id) {
-        // Optional<Produto> produto = produtoRepository.findById(id);
-        // return produto.isPresent() ? produto.get() : null;
+    public Produto obterPorId(@PathVariable UUID id) {
+        return produtoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Produto não encontrado"));
+    }
 
-        return produtoRepository.findById(id).orElse(null);
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarProduto(@PathVariable UUID id) {
+        produtoRepository.deleteById(id);
     }
 }
